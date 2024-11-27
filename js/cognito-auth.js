@@ -170,4 +170,35 @@ var WildRydes = window.WildRydes || {};
             }
         );
     }
+    // Charger la configuration définie dans config.js
+const config = window._config; // Si côté navigateur
+// Ou utilisez `require('./config')` si côté serveur ou Node.js
+
+// Exemple d'authentification avec Cognito
+const AWS = require('aws-sdk'); // Utilisé uniquement si Node.js ou bundlé avec Webpack/Vite
+const cognito = new AWS.CognitoIdentityServiceProvider();
+
+const username = 'your_username';
+const password = 'your_password';
+
+// Calculer le SECRET_HASH en utilisant la fonction du config.js
+const secretHash = config.calculateSecretHash(username);
+
+// Appeler Cognito pour l'authentification
+cognito.initiateAuth({
+    AuthFlow: 'USER_PASSWORD_AUTH',
+    AuthParameters: {
+        USERNAME: username,
+        PASSWORD: password,
+        SECRET_HASH: secretHash
+    },
+    ClientId: config.cognito.userPoolClientId
+}, (err, data) => {
+    if (err) {
+        console.error('Erreur d\'authentification :', err);
+    } else {
+        console.log('Authentification réussie :', data);
+    }
+});
+
 }(jQuery));
